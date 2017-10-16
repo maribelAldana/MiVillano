@@ -1,0 +1,157 @@
+import main.*
+
+describe "Test mi villano objetoso" {
+	
+	var piramide = new Piramide(90)
+	var congelar = new Congelar(500)
+	var buenosAires = new Ciudad(20,piramide)
+	var gru = new Villano()
+	var rayoCongelante = new Arma("rayo congelante",30)
+	/* cambie la instanciacion del minion */
+	var pepe = new Minion("pepe",amarillo,500,rayoCongelante)
+	var gordito = new Minion("gordito",amarillo,900, new Arma("rayo congelante",90))
+	var redondito = new Minion("redondito",amarillo,540, new Arma("rayo congelante",35))
+	
+
+fixture {
+	
+	gru.agregarMinion(pepe)
+	gru.ciudad(buenosAires)
+	
+}
+
+method gorditoArmado(){
+	gordito.agregarArma(new Arma("rayo Congelante",40))
+	gordito.agregarArma(new Arma("rayo Laser",20))
+}
+
+method buenosAiresConObjetos(){
+	buenosAires.agregarObjeto(sueroMutante)	
+	buenosAires.agregarObjeto(luna)	
+}
+
+test "Se crea un minion amarillo con 5 bananas y un rayo congelante con 10 de potencia" {
+	
+	gru.nuevoMinion("roby")
+	assert.that(gru.ejercito().last().nombre() == "roby")
+
+}
+
+test "se le otorga un arma a un minion" {
+	
+	pepe.agregarArma(new Arma("rayo congelante",20))
+	assert.equals(pepe.armas().size(), 2)
+	
+}
+
+test "Se alimenta a un minion" {
+	
+	gru.alimentarA(pepe,2)
+	assert.equals(502,pepe.bananas())
+}
+
+test "Se verifica si un minion es peligroso" {
+	assert.that(pepe.esPeligroso().negate())
+}
+
+test "Pepe que es un minion amarillo toma la pocion" {
+	pepe.absorberSueroMutante()
+	assert.equals(violeta,pepe.color())
+	assert.equals(499,pepe.bananas())
+}
+
+test "Gru planifica hacer un congelamiento" {
+	pepe.agregarArma(new Arma("rayo congelante",20))
+	gru.planificarMaldad(congelar)
+	assert.equals(-10,buenosAires.temperatura())
+	assert.equals(510,pepe.bananas())
+}
+
+test "Gru planifica robar una piramide"{
+	pepe.agregarArma(new Arma("rayo congelante",20))
+	pepe.absorberSueroMutante()
+	gru.planificarMaldad(piramide)
+	
+	assert.equals([],buenosAires.objetosQuePosee())
+	assert.equals(509,pepe.bananas())
+	
+	
+}
+	
+test "Gru planifica robar el Suero mutante"{
+	self.buenosAiresConObjetos()
+	self.gorditoArmado()
+	gru.agregarMinion(gordito)
+	gru.agregarMinion(redondito)
+	gru.planificarMaldad(sueroMutante)
+	
+	assert.equals(2,buenosAires.objetosQuePosee().size())
+	assert.equals(violeta,gordito.color())
+	
+}
+
+test "Gru roba la Luna "{
+	self.buenosAiresConObjetos()
+	self.gorditoArmado()
+	gru.agregarMinion(gordito)
+	
+	assert.throwsExceptionWithMessage("No hay minions que pueden hacer la maldad", {gru.planificarMaldad(luna)})
+
+}
+
+test "El minion mas util de gru es Pepe" {
+	pepe.agregarMaldad(congelar)
+	pepe.agregarMaldad(piramide)
+	gru.agregarMinion(redondito)
+	redondito.agregarMaldad(congelar)
+	
+	assert.equals(pepe,gru.minionMasUtil())
+	
+}
+
+test "El minion mas inutil de gru es gordito" {
+	pepe.agregarMaldad(congelar)
+	pepe.agregarMaldad(piramide)
+	gru.agregarMinion(redondito)
+	redondito.agregarMaldad(congelar)
+	gru.agregarMinion(gordito)
+	
+	assert.equals([gordito],gru.minionsMasInutiles())
+}
+
+
+
+/*Punto 4 */
+/*a)Se crearia un nuevo objeto verde y dentro de este objeto tendria los mismos metodos que el objeto amarillo
+ * y el objeto violeta pero con un comportamiento distinto en los metodos aplicarCambios, nivelDeConcentracionPorColor
+ * y el metodo esPeligrosoMinion esto aprovecha el polimorfismo ya que no importa el color en que se transforme minion
+ * ya que con el polimorfismo todos los colores entienden el mismo mensaje pero aplican diferentes comportamientos
+ * dependiendo del color 
+ * 
+ * Ejemplo del nuevo comportamiento del color verde
+ * 
+ * Un minion de color verde nunca es peligroso 
+ * 
+ * method esPeligrosoMinion() {
+ * 		return false
+ * }
+ * 
+ * Un minion violeta al tomar el suero se transforma en verde y pierde 3 bananas
+ * 
+ * method aplicarCambio(unMinion) {
+ * 		unMinion.color(verde)
+ * 		unMinion.bananas(-3)
+ * }
+ * 
+ * Un minion de color verde tiene un nivel de concentracion igual a la cantidad de bananas que
+ * posee mas 2
+ * 
+ * method nivelDeConcentracionPorColor(unMinion) {
+ * 		return unMinion.bananas() + 2
+ * }
+ * 
+ */
+/*b)En ese caso el metodo aplicarCambios del objeto violeta no hace nada */
+
+
+}
